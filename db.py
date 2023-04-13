@@ -28,7 +28,3 @@ def read_money():
 def write_money(money):
     with open('money.txt', 'w') as f:
         f.write(str(money))
-
-        #with open(INVENTORY_FILENAME, "w") as file:
-        #    for item in inventory:
-        #        file.write(item + "\n")

@@ -5,12 +5,12 @@ def get_deck():
     deck_of_cards = []
     suits = ['\u2660', '\u2661','\u2662','\u2663']
     ranks = ['Ace', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'Jack', 'Queen', 'King']
-    values = {'Ace': 11, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, '10': 10, 'Jack': 10, 'Queen': 10, 'King': 10}
+    values = [11, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
     for suit in suits:
-        for rank in ranks:
-            card = [rank, suit, values[rank]]
+        for i, rank in enumerate(ranks):
+            card = [rank, suit, values[i]]
             deck_of_cards.append(card)
-    #print(deck_of_cards)
+    print(deck_of_cards)
     random.shuffle(deck_of_cards)
     #print(deck_of_cards)
 
@@ -18,8 +18,6 @@ def get_deck():
 
 def get_bet(player_money):
     print()
-    # print(f"Money: {player_money}")
-    # player_bet = int(input("Bet Amount:  "))
     print(f"Money: {player_money}")
     while True:
         try:
@@ -35,32 +33,77 @@ def get_bet(player_money):
     player_money -= bet_amount
     return bet_amount
 
+
 def play_blackjack(player_money):
+    calculate_hand = 0
     deck_of_cards = get_deck()
-
     bet_amount = get_bet(player_money)
-    print(f"This is a test of the bet amount: {bet_amount}")
 
-    #print(f"This is the deck in the play BJ thing ==> {deck_of_cards}")
+    print(f"This is a test of the bet amount: {bet_amount}")
+    print(f"This is the deck in the play BJ thing ==> {deck_of_cards}")
+
     dealer_hand = [deck_of_cards.pop(0), deck_of_cards.pop(0)]
     player_hand = [deck_of_cards.pop(0), deck_of_cards.pop(0)]
 
-
-
-
-    print()
-    print("DEALER's SHOW CARD")
+    print("\nDEALER's SHOW CARD")
+    #for index in dealer_hand:
+    #    print(index[i], index[0])
 
     for i in range(len(dealer_hand)):
         print(f"{dealer_hand[i][0]} {dealer_hand[i][1]}")
 
 
-    print()
-    print("YOUR CARDS")
+
+    print("\nYOUR CARDS")
     #print(player_hand)
     #print(f"Player hand:  {player_hand}")
-    for i in range(len(player_hand)):
-        print(f"{player_hand[i][0]} {player_hand[i][1]}")
+
+
+    for card in player_hand:
+        print(card[0], card[i])
+
+    #for i in range(len(player_hand)):
+    #    print(f"{player_hand[i][0]} {player_hand[i][1]}")
+
+
+    while True:
+        try:
+            player_choice = input("\nDo you want to hit or stand? ")
+            if player_choice.lower() == 'hit':
+                player_hand.append(deck_of_cards.pop())
+                print("Your hand: ", player_hand)
+            if calculate_hand(player_hand) > 21:
+                print("You bust! Dealer wins!")
+                player_money -= bet_amount
+            elif player_choice.lower() == 'stand':
+                break
+            else:
+                print("Invalid input. Please enter hit or stand.")
+        except ValueError:
+            print("Invalid amount.  Please enter a number")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -73,6 +116,10 @@ def main():
 
     player_money = money.read_money()
     play_blackjack(player_money)
+
+
+
+
     #print()
     #print(f"This is a test of Player Money ++> {player_money}")
 
