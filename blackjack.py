@@ -10,15 +10,23 @@ def get_deck():
         for i, rank in enumerate(ranks):
             card = [rank, suit, values[i]]
             deck_of_cards.append(card)
-
     random.shuffle(deck_of_cards)
-    # print(deck_of_cards)
-
     return deck_of_cards
 
 def get_bet(player_money):
     print()
     print(f"Money: {player_money}")
+
+    if player_money < 5:
+        buy_chips = input("Minimum bet is $5.  Would you like to buy more chips (y/n): ")
+        if buy_chips == "y":
+            buy_chips(player_money)
+        else:
+            pass
+
+
+
+
     while True:
         try:
             bet_amount = float(input("Bet amount: "))
@@ -32,6 +40,21 @@ def get_bet(player_money):
             print("Invalid bet. Please enter another bet.")
     player_money -= bet_amount
     return bet_amount
+
+
+def buy_chips(player_money):
+    while True:
+        try:
+            amount_of_chips = float(input("How many chips would you like to buy: "))
+            if amount_of_chips < 5:
+                print("Minimum purchase is $5.")
+            else:
+                player_money += amount_of_chips
+                money.write_money(money)
+                print(f"Money: {player_money}")
+                return player_money
+        except ValueError:
+            print("Invalid option. Please enter a number.")
 
 
 def get_hand_value(card_hand):
@@ -58,72 +81,71 @@ def player_turn(deck_of_cards, player_hand, player_money, bet_amount):
                 print(card[0], card[i])
 
             player_hand_total = get_hand_value(player_hand)
-
+            #while player_hand_total > 21:
             if player_hand_total > 21:
                 print("Sorry.  You lose.")
-                player_money -= bet_amount
-                print(f"Money: {player_money}")
+                player_money = player_money - bet_amount
                 money.write_money(player_money)
                 break
-
+            #break
         elif player_choice.lower() == "stand":
             break
+    return player_money
 
 
-def dealer_turn(deck_of_cards, player_hand_total, dealer_hand, dealer_hand_total, player_money, bet_amount):
+def dealer_turn(deck_of_cards, player_hand_total, dealer_hand, dealer_hand_total, player_money, bet_amount, player_hand):
     i = 1
 
-    print(f"This is a test of the deck of cards ==> {deck_of_cards}")
-
+    player_hand_total = get_hand_value(player_hand)
     if player_hand_total <= 21:
         print("\nDEALER'S CARDS:")
         for card in dealer_hand:
             print(card[0], card[i])
 
-        while dealer_hand_total <= 17:
-            dealer_hand.append(deck_of_cards.pop(0))
+    while dealer_hand_total <= 17:
+        dealer_hand.append(deck_of_cards.pop(0))
+        dealer_hand_total = get_hand_value(dealer_hand)
 
-            #for card in dealer_hand:
-            #    print(card[0], card[i])
+        for card in dealer_hand:
+            print(card[0], card[i])
 
-        print(f"\nYOUR POINTS: {player_hand_total:>8}")
-        print(f"DEALER'S POINTS: {dealer_hand_total:>5}")
 
-        if dealer_hand_total > 21:
-            print("\nCongratulations.  You win!")
-            player_money += bet_amount
-            money.write_money(player_money)
-            print(f"Money: {player_money}")
-        elif dealer_hand_total > player_hand_total and dealer_hand_total <= 21:
-            print("\nSorry.  You lose.")
-            player_money -= bet_amount
-            money.write_money(player_money)
-            print(f"Money: {player_money}")
-        elif player_hand_total > dealer_hand_total and player_hand_total <= 21:
-            print("\nCongratulations.  You win!")
-            player_money += bet_amount
-            money.write_money(player_money)
-            print(f"Money: {player_money}")
-        elif player_hand_total == dealer_hand_total:
-            print("\nIT'S A TIE!")
-            player_money += bet_amount
-            money.write_money(player_money)
-            print(f"Money: {player_money}")
+
+    if dealer_hand_total > 21:
+        print("\nCongratulations.  You win!")
+        player_money += bet_amount
+        for card in dealer_hand:
+            print(card[0], card[i])
+    elif dealer_hand_total > player_hand_total and dealer_hand_total <= 21:
+        print("\nSorry.  You lose.")
+        player_money -= bet_amount
+    elif player_hand_total > dealer_hand_total and player_hand_total <= 21:
+        print("\nCongratulations.  You win!")
+        player_money += bet_amount
+    elif player_hand_total == dealer_hand_total:
+        print("\nIT'S A TIE!")
+        player_money += bet_amount
+
+    money.write_money(player_money)
+
+    print(f"\nYOUR POINTS: {player_hand_total:>8}")
+    print(f"DEALER'S POINTS: {dealer_hand_total:>5}")
 
 
 def check_for_blackjack(player_hand_total, dealer_hand_total, player_money, bet_amount):
+    blackjack_check = 0
     if player_hand_total == 21 and dealer_hand_total == 21:
         print("No winners, it's a push")
     elif player_hand_total == 21:
         print("\nCongratulations.  You win!")
-        player_money += bet_amount
-        money.write_money(player_money)
-        print(f"Money: {player_money}")
+        player_money += round(bet_amount * 1.5)
+        blackjack_check = 1
     elif dealer_hand_total == 21:
         print("\nSorry.  You lose.")
         player_money -= bet_amount
-        money.write_money(player_money)
-        print(f"Money: {player_money}")
+        blackjack_check = 1
+    money.write_money(player_money)
+    return blackjack_check
 
 
 def play_blackjack(player_money):
@@ -132,107 +154,33 @@ def play_blackjack(player_money):
     bet_amount = get_bet(player_money)
     dealer_hand = [deck_of_cards.pop(0), deck_of_cards.pop(0)]
     player_hand = [deck_of_cards.pop(0), deck_of_cards.pop(0)]
-
     player_hand_total = get_hand_value(player_hand)
     dealer_hand_total = get_hand_value(dealer_hand)
 
-
-
     print("\nDEALER's SHOW CARD")
     print(dealer_hand[0][0], dealer_hand[0][1])
-
-
-    #for card in dealer_hand:
-    #    print(card[0], card[i])
-
-
     print("\nYOUR CARDS")
     for card in player_hand:
         print(card[0], card[i])
+    blackjack_check = check_for_blackjack(player_hand_total, dealer_hand_total, player_money, bet_amount)
+    while blackjack_check == 1:
+        break
+    player_money = player_turn(deck_of_cards, player_hand, player_money, bet_amount)
 
+    print(f"test for player hand value in play blackjact +++> {player_money}")
 
-    check_for_blackjack(player_hand_total, dealer_hand_total, player_money, bet_amount)
-
-    player_turn(deck_of_cards, player_hand, player_money, bet_amount)
-
-    #while True:
-    #    player_choice = input("\nHit or stand? (hit/stand): ")
-    #    if player_choice.lower() == 'hit':
-    #        player_hand.append(deck_of_cards.pop(0))
-    #        print("\nYOUR CARDS")
-    #        for card in player_hand:
-    #            print(card[0], card[i])
-
-    #        player_hand_total = get_hand_value(player_hand)
-
-    ##        if player_hand_total > 21:
-    #            print("Sorry.  You lose.")
-    #            player_money -= bet_amount
-    #            print(f"Money: {player_money}")
-    #            player_money = money.write_money(player_money)
-    #            #print(f"Money: {player_money}")
-    #            break
-    #        continue
-    #    elif player_choice.lower() == "stand":
-    #        break
-
-
-    #player_hand_total = get_hand_value(player_hand)
-    #dealer_hand_total = get_hand_value(dealer_hand)
-
-    dealer_turn(deck_of_cards, player_hand_total, dealer_hand, dealer_hand_total, player_money, bet_amount)
-
-    #if player_hand_total <= 21:
-    #    print("\nDEALER'S CARDS:")
-    #    for card in dealer_hand:
-    #        print(card[0], card[i])
-
-    #while dealer_hand_total <= 17:
-    #    dealer_hand.append(deck_of_cards.pop(0))
-
-    #    for card in dealer_hand:
-    #        print(card[0], card[i])
-
-    #    print(f"\nYOUR POINTS: {player_hand_total:>8}")
-    #    print(f"DEALER'S POINTS: {dealer_hand_total:>5}")
-
-    #    if dealer_hand_total > 21:
-    #        print("\nCongratulations.  You win!")
-    #        player_money += bet_amount
-    #        money.write_money(player_money)
-    #        print(f"Money: {player_money}")
-    #    elif dealer_hand_total > player_hand_total and dealer_hand_total <= 21:
-    #        print("\nSorry.  You lose.")
-    #        player_money -= bet_amount
-    #        money.write_money(player_money)
-    #        print(f"Money: {player_money}")
-    #    elif player_hand_total > dealer_hand_total and player_hand_total <= 21:
-    #        print("\nCongratulations.  You win!")
-    #        player_money += bet_amount
-    #        money.write_money(player_money)
-    #        print(f"Money: {player_money}")
-    #    elif player_hand_total == dealer_hand_total:
-    #        print("\nIT'S A TIE!")
-    #        player_money += bet_amount
-    #        money.write_money(player_money)
-    #        print(f"Money: {player_money}")
-
+    dealer_turn(deck_of_cards, player_hand_total, dealer_hand, dealer_hand_total, player_money, bet_amount, player_hand)
 
 
 def main():
     print()
     print("BLACKJACK!")
     print("Blackjack payout is 3:2")
-
     play_again = "y"
     while play_again.lower() == "y":
         player_money = money.read_money()
         play_blackjack(player_money)
-        print()
-
-        play_again = input("Play again (y/n): ")
-        print()
-
+        play_again = input("\nPlay again (y/n): ")
     print("Come back Soon!")
     print("Bye!")
 
