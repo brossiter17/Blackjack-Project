@@ -25,6 +25,6 @@ def read_money():
     #    print("Exiting program.  Bye!")
 
 
-def write_money(money):
+def write_money(player_money):
     with open('money.txt', 'w') as f:
-        f.write(str(money))
+        f.write(str(player_money))

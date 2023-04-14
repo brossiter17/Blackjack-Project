@@ -10,9 +10,9 @@ def get_deck():
         for i, rank in enumerate(ranks):
             card = [rank, suit, values[i]]
             deck_of_cards.append(card)
-    print(deck_of_cards)
+
     random.shuffle(deck_of_cards)
-    #print(deck_of_cards)
+    # print(deck_of_cards)
 
     return deck_of_cards
 
@@ -29,82 +29,193 @@ def get_bet(player_money):
             else:
                 break
         except ValueError:
-            print("Invalid input. Please enter a number.")
+            print("Invalid bet. Please enter another bet.")
     player_money -= bet_amount
     return bet_amount
 
 
+def get_hand_value(card_hand):
+    card_total = 0
+    number_of_aces = 0
+    for card in card_hand:
+        card_total += card[2]
+        if card[0] == 'Ace':
+            number_of_aces += 1
+    while card_total > 21 and number_of_aces > 0:
+        card_total -= 10
+        number_of_aces -= 1
+    return card_total
+
+
+def player_turn(deck_of_cards, player_hand, player_money, bet_amount):
+    i = 1
+    while True:
+        player_choice = input("\nHit or stand? (hit/stand): ")
+        if player_choice.lower() == 'hit':
+            player_hand.append(deck_of_cards.pop(0))
+            print("\nYOUR CARDS")
+            for card in player_hand:
+                print(card[0], card[i])
+
+            player_hand_total = get_hand_value(player_hand)
+
+            if player_hand_total > 21:
+                print("Sorry.  You lose.")
+                player_money -= bet_amount
+                print(f"Money: {player_money}")
+                money.write_money(player_money)
+                break
+
+        elif player_choice.lower() == "stand":
+            break
+
+
+def dealer_turn(deck_of_cards, player_hand_total, dealer_hand, dealer_hand_total, player_money, bet_amount):
+    i = 1
+
+    print(f"This is a test of the deck of cards ==> {deck_of_cards}")
+
+    if player_hand_total <= 21:
+        print("\nDEALER'S CARDS:")
+        for card in dealer_hand:
+            print(card[0], card[i])
+
+        while dealer_hand_total <= 17:
+            dealer_hand.append(deck_of_cards.pop(0))
+
+            #for card in dealer_hand:
+            #    print(card[0], card[i])
+
+        print(f"\nYOUR POINTS: {player_hand_total:>8}")
+        print(f"DEALER'S POINTS: {dealer_hand_total:>5}")
+
+        if dealer_hand_total > 21:
+            print("\nCongratulations.  You win!")
+            player_money += bet_amount
+            money.write_money(player_money)
+            print(f"Money: {player_money}")
+        elif dealer_hand_total > player_hand_total and dealer_hand_total <= 21:
+            print("\nSorry.  You lose.")
+            player_money -= bet_amount
+            money.write_money(player_money)
+            print(f"Money: {player_money}")
+        elif player_hand_total > dealer_hand_total and player_hand_total <= 21:
+            print("\nCongratulations.  You win!")
+            player_money += bet_amount
+            money.write_money(player_money)
+            print(f"Money: {player_money}")
+        elif player_hand_total == dealer_hand_total:
+            print("\nIT'S A TIE!")
+            player_money += bet_amount
+            money.write_money(player_money)
+            print(f"Money: {player_money}")
+
+
+def check_for_blackjack(player_hand_total, dealer_hand_total, player_money, bet_amount):
+    if player_hand_total == 21 and dealer_hand_total == 21:
+        print("No winners, it's a push")
+    elif player_hand_total == 21:
+        print("\nCongratulations.  You win!")
+        player_money += bet_amount
+        money.write_money(player_money)
+        print(f"Money: {player_money}")
+    elif dealer_hand_total == 21:
+        print("\nSorry.  You lose.")
+        player_money -= bet_amount
+        money.write_money(player_money)
+        print(f"Money: {player_money}")
+
+
 def play_blackjack(player_money):
-    calculate_hand = 0
+    i = 1
     deck_of_cards = get_deck()
     bet_amount = get_bet(player_money)
-
-    print(f"This is a test of the bet amount: {bet_amount}")
-    print(f"This is the deck in the play BJ thing ==> {deck_of_cards}")
-
     dealer_hand = [deck_of_cards.pop(0), deck_of_cards.pop(0)]
     player_hand = [deck_of_cards.pop(0), deck_of_cards.pop(0)]
 
+    player_hand_total = get_hand_value(player_hand)
+    dealer_hand_total = get_hand_value(dealer_hand)
+
+
+
     print("\nDEALER's SHOW CARD")
-    #for index in dealer_hand:
-    #    print(index[i], index[0])
+    print(dealer_hand[0][0], dealer_hand[0][1])
 
-    for i in range(len(dealer_hand)):
-        print(f"{dealer_hand[i][0]} {dealer_hand[i][1]}")
 
+    #for card in dealer_hand:
+    #    print(card[0], card[i])
 
 
     print("\nYOUR CARDS")
-    #print(player_hand)
-    #print(f"Player hand:  {player_hand}")
-
-
     for card in player_hand:
         print(card[0], card[i])
 
-    #for i in range(len(player_hand)):
-    #    print(f"{player_hand[i][0]} {player_hand[i][1]}")
+
+    check_for_blackjack(player_hand_total, dealer_hand_total, player_money, bet_amount)
+
+    player_turn(deck_of_cards, player_hand, player_money, bet_amount)
+
+    #while True:
+    #    player_choice = input("\nHit or stand? (hit/stand): ")
+    #    if player_choice.lower() == 'hit':
+    #        player_hand.append(deck_of_cards.pop(0))
+    #        print("\nYOUR CARDS")
+    #        for card in player_hand:
+    #            print(card[0], card[i])
+
+    #        player_hand_total = get_hand_value(player_hand)
+
+    ##        if player_hand_total > 21:
+    #            print("Sorry.  You lose.")
+    #            player_money -= bet_amount
+    #            print(f"Money: {player_money}")
+    #            player_money = money.write_money(player_money)
+    #            #print(f"Money: {player_money}")
+    #            break
+    #        continue
+    #    elif player_choice.lower() == "stand":
+    #        break
 
 
-    while True:
-        try:
-            player_choice = input("\nDo you want to hit or stand? ")
-            if player_choice.lower() == 'hit':
-                player_hand.append(deck_of_cards.pop())
-                print("Your hand: ", player_hand)
-            if calculate_hand(player_hand) > 21:
-                print("You bust! Dealer wins!")
-                player_money -= bet_amount
-            elif player_choice.lower() == 'stand':
-                break
-            else:
-                print("Invalid input. Please enter hit or stand.")
-        except ValueError:
-            print("Invalid amount.  Please enter a number")
+    #player_hand_total = get_hand_value(player_hand)
+    #dealer_hand_total = get_hand_value(dealer_hand)
 
+    dealer_turn(deck_of_cards, player_hand_total, dealer_hand, dealer_hand_total, player_money, bet_amount)
 
+    #if player_hand_total <= 21:
+    #    print("\nDEALER'S CARDS:")
+    #    for card in dealer_hand:
+    #        print(card[0], card[i])
 
+    #while dealer_hand_total <= 17:
+    #    dealer_hand.append(deck_of_cards.pop(0))
 
+    #    for card in dealer_hand:
+    #        print(card[0], card[i])
 
+    #    print(f"\nYOUR POINTS: {player_hand_total:>8}")
+    #    print(f"DEALER'S POINTS: {dealer_hand_total:>5}")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    #    if dealer_hand_total > 21:
+    #        print("\nCongratulations.  You win!")
+    #        player_money += bet_amount
+    #        money.write_money(player_money)
+    #        print(f"Money: {player_money}")
+    #    elif dealer_hand_total > player_hand_total and dealer_hand_total <= 21:
+    #        print("\nSorry.  You lose.")
+    #        player_money -= bet_amount
+    #        money.write_money(player_money)
+    #        print(f"Money: {player_money}")
+    #    elif player_hand_total > dealer_hand_total and player_hand_total <= 21:
+    #        print("\nCongratulations.  You win!")
+    #        player_money += bet_amount
+    #        money.write_money(player_money)
+    #        print(f"Money: {player_money}")
+    #    elif player_hand_total == dealer_hand_total:
+    #        print("\nIT'S A TIE!")
+    #        player_money += bet_amount
+    #        money.write_money(player_money)
+    #        print(f"Money: {player_money}")
 
 
 
@@ -113,21 +224,17 @@ def main():
     print("BLACKJACK!")
     print("Blackjack payout is 3:2")
 
+    play_again = "y"
+    while play_again.lower() == "y":
+        player_money = money.read_money()
+        play_blackjack(player_money)
+        print()
 
-    player_money = money.read_money()
-    play_blackjack(player_money)
+        play_again = input("Play again (y/n): ")
+        print()
 
-
-
-
-    #print()
-    #print(f"This is a test of Player Money ++> {player_money}")
-
-
-
-
-
-
+    print("Come back Soon!")
+    print("Bye!")
 
 
 if __name__ == '__main__':
