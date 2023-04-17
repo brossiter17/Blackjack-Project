@@ -10,8 +10,6 @@ def read_money():
             sys.exit(1)
     return player_money
 
-
-
 def write_money(player_money):
     try:
         with open('money.txt', 'w') as f:
